@@ -1,0 +1,56 @@
+/* Custom Cursor Styling */
+html,
+body {
+    cursor: none !important;
+}
+
+/* Ensure links and buttons also hide default cursor */
+a,
+button,
+input,
+textarea,
+select,
+label,
+.btn,
+.nav-link {
+    cursor: none !important;
+}
+
+.custom-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    /* Transformation handled by JS for performant tracking, but initial center needed */
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: opacity 0.2s ease;
+}
+
+.custom-cursor-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+    transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.custom-cursor-follower.is-hovering {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+}
