@@ -539,7 +539,7 @@ a.text-dark:focus {
 }
 
 /* Improve pointer/touch behavior on the carousel container */
-.peek-carousel { touch-action: pan-y; }
+.peek-carousel { touch-action: pan-y; overflow-y: hidden; scroll-behavior: auto; }
 
 /* Thank you screen */
 .thankyou-screen {
@@ -766,7 +766,8 @@ textarea.form-control-dark {
     gap: 1rem;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
     padding-left: 1rem;
     padding-right: 1rem;
     align-items: start;
@@ -774,6 +775,9 @@ textarea.form-control-dark {
 
 .peek-carousel.dragging {
     cursor: grabbing;
+}
+.peek-carousel:hover {
+    cursor: grab;
 }
 
 .peek-carousel::-webkit-scrollbar {
@@ -800,7 +804,6 @@ textarea.form-control-dark {
 .peek-card.active {
     transform: scale(1.03);
     z-index: 5;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 6px 18px rgba(0,0,0,0.35);
 }
 
 .peek-card:not(.active) {
@@ -819,7 +822,7 @@ textarea.form-control-dark {
 
 /* Slight hover lift for pointer users */
 @media (hover: hover) {
-    .peek-card:hover { transform: translateY(-6px) scale(1.02); }
+    .peek-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 6px 18px rgba(0,0,0,0.35); }
     .peek-card:hover .peek-card-media { transform: scale(1.06); }
 }
 
