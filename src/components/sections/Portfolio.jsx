@@ -9,7 +9,7 @@ const Portfolio = () => {
     const dragStartScroll = useRef(0);
     const rafRef = useRef(null);
     const pausedRef = useRef(false);
-    const displayProjects = [...projects, ...projects];
+    const directionRef = useRef(1);
     const [activeIndex, setActiveIndex] = useState(0);
     const [selectedProject, setSelectedProject] = useState(null);
 
@@ -51,11 +51,11 @@ const Portfolio = () => {
     };
 
 
-    // Continuous auto-scroll using requestAnimationFrame; wraps seamlessly using duplicated content
+    // Continuous auto-scroll using requestAnimationFrame; wraps cleanly by resetting position at the edges
     useEffect(() => {
         let rafId = 0;
         let last = 0;
-        const speed = 80; // pixels per second, adjust for desired pace
+        const speed = 85; // pixels per second, adjust for desired pace
 
         const step = (now) => {
             if (!last) last = now;
@@ -63,10 +63,14 @@ const Portfolio = () => {
             last = now;
             const el = carouselRef.current;
             if (el && !pausedRef.current && !isDragging.current && !selectedProject) {
-                el.scrollLeft += speed * dt;
-                const half = el.scrollWidth / 2;
-                if (el.scrollLeft >= half) {
-                    el.scrollLeft -= half;
+                const maxScroll = el.scrollWidth - el.clientWidth;
+                el.scrollLeft += speed * dt * directionRef.current;
+
+                if (directionRef.current > 0 && el.scrollLeft >= maxScroll) {
+                    el.scrollLeft = 0;
+                }
+                if (directionRef.current < 0 && el.scrollLeft <= 0) {
+                    el.scrollLeft = maxScroll;
                 }
             }
             rafId = requestAnimationFrame(step);
@@ -76,19 +80,31 @@ const Portfolio = () => {
         return () => cancelAnimationFrame(rafId);
     }, [selectedProject]);
 
-    // Pause on pointer enter / resume on leave
     useEffect(() => {
         const el = carouselRef.current;
         if (!el) return;
-        const onEnter = () => { pausedRef.current = true; };
-        const onLeave = () => { pausedRef.current = false; };
+        el.scrollLeft = 0;
+    }, []);
+
+    // Reverse scroll direction on hover, pause during drag/tap
+    useEffect(() => {
+        const el = carouselRef.current;
+        if (!el) return;
+        const onEnter = () => { directionRef.current = -1; };
+        const onLeave = () => { directionRef.current = 1; };
+        const onPointerDown = () => { pausedRef.current = true; };
+        const onPointerUp = () => { pausedRef.current = false; };
+
         el.addEventListener('mouseenter', onEnter);
         el.addEventListener('mouseleave', onLeave);
-        el.addEventListener('pointerdown', () => { pausedRef.current = true; });
-        el.addEventListener('pointerup', () => { pausedRef.current = false; });
+        el.addEventListener('pointerdown', onPointerDown);
+        el.addEventListener('pointerup', onPointerUp);
+
         return () => {
             el.removeEventListener('mouseenter', onEnter);
             el.removeEventListener('mouseleave', onLeave);
+            el.removeEventListener('pointerdown', onPointerDown);
+            el.removeEventListener('pointerup', onPointerUp);
         };
     }, []);
 
@@ -160,10 +176,9 @@ const Portfolio = () => {
                                     });
                                 }}
                             >
-                                {displayProjects.map((project, index) => {
-                                    const logical = index % projects.length;
+                                {projects.map((project, index) => {
                                     return (
-                                    <div className={`peek-card ${activeIndex === logical ? 'active' : ''} rounded-4`} key={`peek-${index}`}>
+                                    <div className={`peek-card ${activeIndex === index ? 'active' : ''} rounded-4`} key={`peek-${index}`}>
                                         <div className="portfolio-card position-relative overflow-hidden h-100 group">
                                             <div className="portfolio-img-wrapper position-relative overflow-hidden rounded-4" style={{ height: '360px' }}>
                                                 <div className="w-100 h-100 position-absolute top-0 start-0" style={{ background: project.gradient, opacity: 0.9 }}></div>
